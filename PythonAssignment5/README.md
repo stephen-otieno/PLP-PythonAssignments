@@ -1,6 +1,4 @@
-Here’s a simple and clear README file for your Python OOP project using inheritance and encapsulation:
 
----
 
 📱 Smart Device OOP Example
 
@@ -13,7 +11,6 @@ This Python project demonstrates Object-Oriented Programming (OOP) concepts incl
 
 The program simulates a basic model of smart devices — a Smartphone and a Smartwatch — using class-based design.
 
----
 
 🧱 Project Structure
 
@@ -30,7 +27,6 @@ Classes:
    - Uses default screen size (1.5 inches)
    - Overrides get_specs() to customize smartwatch description
 
----
 
 ✅ Features
 
@@ -39,7 +35,6 @@ Classes:
 - Illustrates method overriding in Smartwatch
 - Emphasizes constructor usage with super()
 
----
 
 ▶ How to Run
 
@@ -60,4 +55,3 @@ Phone Storage: 64 GB
 
 *** Smartwatch ***
 Watch specifications: Apple Series 5 Smartwatch with 1.5 inch display
-```

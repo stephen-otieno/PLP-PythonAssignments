@@ -1,4 +1,3 @@
-
 # ===============================
 # 1. Import Libraries
 # ===============================
@@ -11,27 +10,22 @@ import streamlit as st
 # ===============================
 # 2. Load Data
 # ===============================
-
-#DID NOT INCLUDE THE METADATA.CSV FILE WHEN COMMITING BECAUSE OF IT'S LARGE SIZE
-
+# NOTE: Make sure the file is in the same folder or give the full path
 csv_file = "metadata.csv"   
 df = pd.read_csv(csv_file, low_memory=False)
 
-# ========================
+# ===============================
 # 3. Basic Exploration
 # ===============================
-# Show dataset shape and preview
 print("First 5 rows of the dataset:")
 print(df.head())
 print("\nDataFrame info:")
 print(df.info())
 print("\nShape of dataset (rows, cols):", df.shape)
 
-# Missing values summary
 print("\nMissing values per column:")
 print(df.isnull().sum().sort_values(ascending=False).head(10))
 
-# Numerical summary
 print("\nSummary statistics for numerical columns:")
 print(df.describe())
 
@@ -47,11 +41,17 @@ df_clean['journal'] = df_clean['journal'].fillna("Unknown")
 # Convert publish_time to datetime
 df_clean['publish_time'] = pd.to_datetime(df_clean['publish_time'], errors='coerce')
 
+# Drop rows where publish_time could not be converted
+df_clean = df_clean.dropna(subset=['publish_time'])
+
 # Extract year
 df_clean['year'] = df_clean['publish_time'].dt.year
 
-# Word count for abstracts
-df_clean['abstract_word_count'] = df_clean['abstract'].fillna("").apply(lambda x: len(x.split()))
+# Word count for abstracts (if column exists)
+if 'abstract' in df_clean.columns:
+    df_clean['abstract_word_count'] = df_clean['abstract'].fillna("").apply(lambda x: len(x.split()))
+else:
+    df_clean['abstract_word_count'] = 0
 
 print("\nShape after cleaning:", df_clean.shape)
 
@@ -91,6 +91,7 @@ ax1.set_title("Number of Publications per Year")
 ax1.set_xlabel("Year")
 ax1.set_ylabel("Number of Papers")
 st.pyplot(fig1)
+plt.show()
 
 # Top journals
 st.subheader("Top Journals")
@@ -100,6 +101,7 @@ ax2.set_title("Top 10 Journals Publishing COVID-19 Research")
 ax2.set_xlabel("Number of Papers")
 ax2.set_ylabel("Journal")
 st.pyplot(fig2)
+plt.show()
 
 # WordCloud visualization
 st.subheader("WordCloud of Paper Titles")
@@ -107,11 +109,18 @@ fig3, ax3 = plt.subplots(figsize=(12, 6))
 ax3.imshow(wordcloud, interpolation="bilinear")
 ax3.axis("off")
 st.pyplot(fig3)
+plt.show()
 
 # Interactive year filter
 st.subheader("Filter Papers by Year")
-year_selected = st.slider("Select a year", int(df_clean['year'].min()), int(df_clean['year'].max()))
+years = df_clean['year'].dropna().astype(int)
+year_selected = st.slider("Select a year", int(years.min()), int(years.max()))
 filtered_df = df_clean[df_clean['year'] == year_selected]
 st.write(f"Showing {filtered_df.shape[0]} papers from {year_selected}:")
 st.dataframe(filtered_df[['title', 'journal', 'publish_time']].head(10))
 
+# Optional: Most cited papers if citations column exists
+if 'citations' in df_clean.columns:
+    st.subheader("Most Cited Papers")
+    top_cited = df_clean.sort_values(by='citations', ascending=False).head(10)
+    st.dataframe(top_cited[['title', 'journal', 'citations']])
